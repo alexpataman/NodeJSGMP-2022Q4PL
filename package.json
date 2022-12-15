@@ -1,0 +1,19 @@
+{
+  "name": "nodejsgmp-2022q4pl",
+  "version": "1.0.0",
+  "description": "NodeJS Global Mentoring Program [2022Q4 PL]",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexpataman/NodeJSGMP-2022Q4PL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexpataman/NodeJSGMP-2022Q4PL/issues"
+  },
+  "homepage": "https://github.com/alexpataman/NodeJSGMP-2022Q4PL#readme"
+}
