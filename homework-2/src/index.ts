@@ -50,8 +50,8 @@ app.post('/', validateSchema(newUserSchema), (req, res) => {
     return res.send(user);
 });
 
-app.put('/', validateSchema(existingUserSchema), (req, res) => {
-    const user = findById(users, req.body.id);
+app.put('/:userId', validateSchema(existingUserSchema), (req, res) => {
+    const user = findById(users, req.params.userId);
     if (!user) {
         return res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
     }
