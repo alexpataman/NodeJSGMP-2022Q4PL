@@ -1,7 +1,5 @@
 import { Schema, ValidationErrorItem } from "joi";
 import { HTTP_CODE_BAD_REQUEST, VALIDATION_STATUS_FAILED } from "../constants";
-import { randomUUID } from "crypto";
-import { User } from "../types";
 import { NextFunction, Request, Response } from "express";
 
 export const validateSchema = (schema: Schema) => {
@@ -25,21 +23,4 @@ export const errorResponse = (schemaErrors: ValidationErrorItem[]) => {
     status: VALIDATION_STATUS_FAILED,
     errors,
   };
-};
-
-export const generateUserId = () => randomUUID();
-
-export const findById = <T extends { id: string }>(items: T[], id: string) => {
-  return items.find((item: T) => item.id === id);
-};
-
-export const getAutoSuggestUsers = (
-  users: User[],
-  loginSubstring: string,
-  limit: number
-) => {
-  return users
-    .filter((user) => user.login.indexOf(loginSubstring) !== -1)
-    .sort()
-    .slice(0, limit);
 };

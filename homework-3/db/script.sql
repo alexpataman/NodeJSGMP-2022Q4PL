@@ -5,12 +5,14 @@ create table users (
 	login text,
 	password text,
 	age integer,
-	"isDeleted" boolean default false
+	"isDeleted" boolean default false,
+	"createdAt" timestamp,
+	"updatedAt" timestamp
 );
 
-insert into users(login,password,age) values
-('user1','password1',31),
-('user2','password2',32),
-('user3','password3',33),
-('user4','password4',34),
-('user5','password5',35)
+insert into users(login,password,age,"createdAt") values
+('user1','password1',31, NOW()),
+('user2','password2',32, NOW()),
+('user3','password3',33, NOW()),
+('user4','password4',34, NOW()),
+('user5','password5',35, NOW())
