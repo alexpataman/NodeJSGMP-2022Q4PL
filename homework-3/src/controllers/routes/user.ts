@@ -7,18 +7,19 @@ import {
   MESSAGE_SOMETHING_WRONG,
 } from "../../constants";
 import { validators } from "../middlewares/validators";
-import UserService from "../../services/user";
+import { User } from "../../models/User";
 
 export default (app: Router) => {
   app
     .route("/")
     .get(async (req, res) => {
-      return res.send(await UserService.getAllUsers());
+      return res.send(await User.find());
     })
     .post(validators.addNewUser, async (req, res) => {
-      const result = await UserService.addUser(req.body);
-      return result
-        ? res.send(result)
+      const user = User.create(req.body as User);
+      await user.save();
+      return user
+        ? res.send(user)
         : res.status(HTTP_CODE_BAD_REQUEST).send(MESSAGE_SOMETHING_WRONG);
     });
 
@@ -27,17 +28,14 @@ export default (app: Router) => {
       req.query;
 
     return res.send(
-      await UserService.getAutoSuggestUsers(
-        String(loginSubstring),
-        Number(limit)
-      )
+      await User.getAutoSuggestUsers(String(loginSubstring), Number(limit))
     );
   });
 
   app
     .route("/:userId")
     .get(async (req, res) => {
-      const result = await UserService.getUser(req.params.userId);
+      const result = await User.findOneBy({ id: req.params.userId });
       return result
         ? res.send(result)
         : res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
@@ -47,19 +45,25 @@ export default (app: Router) => {
         params: { userId },
         body,
       } = req;
-      const [, result] = await UserService.updateUser(userId, body);
-      return result
-        ? res.send(result)
-        : res.status(HTTP_CODE_BAD_REQUEST).send(MESSAGE_SOMETHING_WRONG);
+      const user = await User.findOneBy({ id: userId });
+      if (user) {
+        User.merge(user, body);
+        await user.save();
+        res.send(user);
+      } else {
+        res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
+      }
     })
     .delete(async (req, res) => {
       const {
         params: { userId },
-        body,
       } = req;
-      const [, result] = await UserService.deleteUser(userId, body);
-      return result
-        ? res.send(result)
-        : res.status(HTTP_CODE_BAD_REQUEST).send(MESSAGE_SOMETHING_WRONG);
+      const user = await User.findOneBy({ id: userId });
+      if (user) {
+        await user.delete();
+        res.send(user);
+      } else {
+        res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
+      }
     });
 };

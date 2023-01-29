@@ -1,6 +1,6 @@
-drop table users;
+drop table user;
 
-create table users (
+create table user (
 	id uuid primary key default uuid_generate_v4(),
 	login text,
 	password text,
@@ -10,7 +10,7 @@ create table users (
 	"updatedAt" timestamp
 );
 
-insert into users(login,password,age,"createdAt") values
+insert into user(login,password,age,"createdAt") values
 ('user1','password1',31, NOW()),
 ('user2','password2',32, NOW()),
 ('user3','password3',33, NOW()),
