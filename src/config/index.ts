@@ -13,7 +13,7 @@ export default {
   },
   db: {
     host: process.env.DB_HOST,
-    port: Number(process.env.PORT),
+    port: Number(process.env.DB_PORT),
     name: process.env.DB_NAME,
     login: process.env.DB_LOGIN,
     password: process.env.DB_PASSWORD,
