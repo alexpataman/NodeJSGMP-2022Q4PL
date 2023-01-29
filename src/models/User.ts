@@ -3,10 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
   Like,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Group } from "./Group";
 
 @Entity()
 export class User extends BaseEntity {
@@ -24,6 +27,9 @@ export class User extends BaseEntity {
   createdAt!: string;
   @UpdateDateColumn()
   updateAt!: string;
+  @ManyToMany(() => Group, (group) => group.users)
+  @JoinTable()
+  groups!: Group[];
 
   async delete() {
     this.isDeleted = true;

@@ -7,13 +7,21 @@ import {
   MESSAGE_SOMETHING_WRONG,
 } from "../../constants";
 import { validators } from "../middlewares/validators";
-import { User } from "../../models/User";
+import { User } from "../../models";
 
-export default (app: Router) => {
+const USER_PREFIX = "/user";
+
+export const userRouter = (app: Router) => {
   app
-    .route("/")
+    .route(`${USER_PREFIX}/`)
     .get(async (req, res) => {
-      return res.send(await User.find());
+      return res.send(
+        await User.find({
+          relations: {
+            groups: true,
+          },
+        })
+      );
     })
     .post(validators.addNewUser, async (req, res) => {
       const user = User.create(req.body as User);
@@ -23,7 +31,7 @@ export default (app: Router) => {
         : res.status(HTTP_CODE_BAD_REQUEST).send(MESSAGE_SOMETHING_WRONG);
     });
 
-  app.route("/search").get(async (req, res) => {
+  app.route(`${USER_PREFIX}/search`).get(async (req, res) => {
     const { loginSubstring = "", limit = AUTO_SUGGEST_USERS_DEFAULT_LIMIT } =
       req.query;
 
@@ -33,19 +41,19 @@ export default (app: Router) => {
   });
 
   app
-    .route("/:userId")
+    .route(`${USER_PREFIX}/:id`)
     .get(async (req, res) => {
-      const result = await User.findOneBy({ id: req.params.userId });
+      const result = await User.findOneBy({ id: req.params.id });
       return result
         ? res.send(result)
         : res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
     })
     .put(validators.updateExistingUser, async (req, res) => {
       const {
-        params: { userId },
+        params: { id },
         body,
       } = req;
-      const user = await User.findOneBy({ id: userId });
+      const user = await User.findOneBy({ id });
       if (user) {
         User.merge(user, body);
         await user.save();
@@ -56,9 +64,9 @@ export default (app: Router) => {
     })
     .delete(async (req, res) => {
       const {
-        params: { userId },
+        params: { id },
       } = req;
-      const user = await User.findOneBy({ id: userId });
+      const user = await User.findOneBy({ id });
       if (user) {
         await user.delete();
         res.send(user);
