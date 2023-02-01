@@ -7,7 +7,7 @@ import {
   MESSAGE_SOMETHING_WRONG,
 } from "../../constants";
 import { validators } from "../middlewares/validators";
-import { User } from "../../models";
+import { UserService } from "../../services/user";
 
 const USER_PREFIX = "/user";
 
@@ -15,17 +15,10 @@ export const userRouter = (app: Router) => {
   app
     .route(`${USER_PREFIX}/`)
     .get(async (req, res) => {
-      return res.send(
-        await User.find({
-          relations: {
-            groups: true,
-          },
-        })
-      );
+      return res.send(await UserService.getAllUsers());
     })
     .post(validators.addNewUser, async (req, res) => {
-      const user = User.create(req.body as User);
-      await user.save();
+      const user = await UserService.createUser(req.body);
       return user
         ? res.send(user)
         : res.status(HTTP_CODE_BAD_REQUEST).send(MESSAGE_SOMETHING_WRONG);
@@ -36,16 +29,19 @@ export const userRouter = (app: Router) => {
       req.query;
 
     return res.send(
-      await User.getAutoSuggestUsers(String(loginSubstring), Number(limit))
+      await UserService.getAutoSuggestUsers(
+        String(loginSubstring),
+        Number(limit)
+      )
     );
   });
 
   app
     .route(`${USER_PREFIX}/:id`)
     .get(async (req, res) => {
-      const result = await User.findOneBy({ id: req.params.id });
-      return result
-        ? res.send(result)
+      const user = await UserService.getUserById(req.params.id);
+      return user
+        ? res.send(user)
         : res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
     })
     .put(validators.updateExistingUser, async (req, res) => {
@@ -53,10 +49,8 @@ export const userRouter = (app: Router) => {
         params: { id },
         body,
       } = req;
-      const user = await User.findOneBy({ id });
+      const user = await UserService.updateUser(id, body);
       if (user) {
-        User.merge(user, body);
-        await user.save();
         res.send(user);
       } else {
         res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
@@ -66,9 +60,8 @@ export const userRouter = (app: Router) => {
       const {
         params: { id },
       } = req;
-      const user = await User.findOneBy({ id });
+      const user = await UserService.deleteUser(id);
       if (user) {
-        await user.delete();
         res.send(user);
       } else {
         res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);

@@ -6,8 +6,7 @@ import {
   MESSAGE_SOMETHING_WRONG,
 } from "../../constants";
 import { validators } from "../middlewares/validators";
-import { Group, User } from "../../models";
-import { In } from "typeorm";
+import { GroupService } from "../../services/group";
 
 const GROUP_PREFIX = "/group";
 
@@ -15,17 +14,10 @@ export const groupRouter = (app: Router) => {
   app
     .route(`${GROUP_PREFIX}/`)
     .get(async (req, res) => {
-      return res.send(
-        await Group.find({
-          relations: {
-            users: true,
-          },
-        })
-      );
+      return res.send(await GroupService.getAllGroups());
     })
     .post(validators.addNewGroup, async (req, res) => {
-      const group = Group.create(req.body as Group);
-      await group.save();
+      const group = GroupService.createGroup(req.body);
       return group
         ? res.send(group)
         : res.status(HTTP_CODE_BAD_REQUEST).send(MESSAGE_SOMETHING_WRONG);
@@ -34,9 +26,9 @@ export const groupRouter = (app: Router) => {
   app
     .route(`${GROUP_PREFIX}/:id`)
     .get(async (req, res) => {
-      const result = await Group.findOneBy({ id: req.params.id });
-      return result
-        ? res.send(result)
+      const group = await GroupService.getGroupById(req.params.id);
+      return group
+        ? res.send(group)
         : res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
     })
     .put(validators.updateExistingGroup, async (req, res) => {
@@ -44,10 +36,8 @@ export const groupRouter = (app: Router) => {
         params: { id },
         body,
       } = req;
-      const group = await Group.findOneBy({ id });
+      const group = await GroupService.updateGroup(id, body);
       if (group) {
-        Group.merge(group, body);
-        await group.save();
         res.send(group);
       } else {
         res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
@@ -57,9 +47,8 @@ export const groupRouter = (app: Router) => {
       const {
         params: { id },
       } = req;
-      const group = await Group.findOneBy({ id });
+      const group = await GroupService.deleteGroup(id);
       if (group) {
-        await group.remove();
         res.send(group);
       } else {
         res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);
@@ -72,11 +61,8 @@ export const groupRouter = (app: Router) => {
       const {
         body: { groupId, userIds },
       } = req;
-      const group = await Group.findOneBy({ id: groupId });
-      const users = await User.findBy({ id: In(userIds) });
-      if (group && users.length) {
-        group.users = users;
-        await group.save();
+      const group = await GroupService.addUsersToGroup(groupId, userIds);
+      if (group) {
         res.send(group);
       } else {
         res.status(HTTP_CODE_NOT_FOUND).send(MESSAGE_NOT_FOUND);

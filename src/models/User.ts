@@ -36,14 +36,4 @@ export class User extends BaseEntity {
     await this.save();
     return this;
   }
-
-  static getAutoSuggestUsers(loginSubstring: string, limit: number) {
-    return User.find({
-      where: {
-        login: Like(`%${loginSubstring}%`),
-      },
-      order: { login: "ASC" },
-      take: limit,
-    });
-  }
 }
