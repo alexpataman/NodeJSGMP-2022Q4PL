@@ -1,5 +1,5 @@
 import express, { Express } from "express";
-import routes from "../controllers";
+import routes from "../api";
 import config from "../config";
 
 export default (app: Express) => {
