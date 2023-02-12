@@ -1,6 +1,7 @@
 import config from "../config";
 import { DataSource } from "typeorm";
 import { Group, User } from "../models";
+import { logger, LOGGER_LEVEL } from "../utils/logger";
 
 export const dbLoader = async () => {
   const AppDataSource = new DataSource({
@@ -8,17 +9,21 @@ export const dbLoader = async () => {
     host: config.db.host,
     port: config.db.port,
     username: config.db.login,
-    password: config.db.password,
+    password: config.db.password + "1",
     database: config.db.name,
     synchronize: true,
-    logging: true,
+    logging: config.db.logging,
     entities: [Group, User],
   });
 
   try {
     await AppDataSource.initialize();
   } catch (error) {
-    console.error(error);
+    const { message } = error as Error;
+    logger.log({
+      level: LOGGER_LEVEL.ERROR,
+      message,
+    });
   }
 };
 
