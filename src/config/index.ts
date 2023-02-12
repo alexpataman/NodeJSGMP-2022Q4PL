@@ -17,5 +17,6 @@ export default {
     name: process.env.DB_NAME,
     login: process.env.DB_LOGIN,
     password: process.env.DB_PASSWORD,
+    logging: false,
   },
 };

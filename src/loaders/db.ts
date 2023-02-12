@@ -11,7 +11,7 @@ export const dbLoader = async () => {
     password: config.db.password,
     database: config.db.name,
     synchronize: true,
-    logging: true,
+    logging: config.db.logging,
     entities: [Group, User],
   });
 
