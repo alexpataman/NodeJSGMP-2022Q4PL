@@ -21,7 +21,7 @@ export const authorization = (
     });
   }
 
-  return jwt.verify(token, config.jwt.secret, (error) => {
+  jwt.verify(token, config.jwt.secret, (error) => {
     if (error) {
       return res.status(HTTP_CODE_FORBIDDEN).send({
         success: false,
