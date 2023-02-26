@@ -1,5 +1,7 @@
 import { In, Like } from "typeorm";
 import { User } from "../models";
+import jwt from "jsonwebtoken";
+import config from "../config";
 
 export const UserService = {
   async getAllUsers() {
@@ -43,5 +45,14 @@ export const UserService = {
       order: { login: "ASC" },
       take: limit,
     });
+  },
+  async login(login: string, password: string) {
+    const user = await User.findOneBy({ login, password });
+    if (user) {
+      const payload = { sub: user.id, name: user.login };
+      return jwt.sign(payload, config.jwt.secret, {
+        expiresIn: config.jwt.expiresIn,
+      });
+    }
   },
 };

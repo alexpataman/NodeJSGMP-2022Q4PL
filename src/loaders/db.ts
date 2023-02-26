@@ -9,7 +9,7 @@ export const dbLoader = async () => {
     host: config.db.host,
     port: config.db.port,
     username: config.db.login,
-    password: config.db.password + "1",
+    password: config.db.password,
     database: config.db.name,
     synchronize: true,
     logging: config.db.logging,
