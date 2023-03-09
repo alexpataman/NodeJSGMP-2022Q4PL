@@ -2,6 +2,7 @@ import { In, Like } from "typeorm";
 import { User } from "../models";
 import jwt from "jsonwebtoken";
 import config from "../config";
+import { generateSalt, hashPassword, isPasswordValid } from "../utils/crypto";
 
 export const UserService = {
   async getAllUsers() {
@@ -19,6 +20,8 @@ export const UserService = {
   },
   async createUser(data: User) {
     const user = User.create(data);
+    user.salt = generateSalt();
+    user.password = hashPassword(user.password, user.salt);
     await user.save();
     return user;
   },
@@ -47,8 +50,8 @@ export const UserService = {
     });
   },
   async login(login: string, password: string) {
-    const user = await User.findOneBy({ login, password });
-    if (user) {
+    const user = await User.findOneBy({ login });
+    if (user && isPasswordValid(password, user.salt, user.password)) {
       const payload = { sub: user.id, name: user.login };
       return jwt.sign(payload, config.jwt.secret, {
         expiresIn: config.jwt.expiresIn,
