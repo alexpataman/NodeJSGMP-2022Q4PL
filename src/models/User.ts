@@ -4,7 +4,6 @@ import {
   CreateDateColumn,
   Entity,
   JoinTable,
-  Like,
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -19,6 +18,8 @@ export class User extends BaseEntity {
   login!: string;
   @Column("text")
   password!: string;
+  @Column("text")
+  salt!: string;
   @Column("numeric")
   age!: number;
   @Column({ type: "boolean", default: false })

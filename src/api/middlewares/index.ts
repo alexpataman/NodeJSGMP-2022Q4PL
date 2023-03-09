@@ -1,3 +1,4 @@
+export { authorization } from "./authorization";
 export { errorHandler } from "./errorHandler";
 export { executionTimeLogger } from "./executionTimeLogger";
 export { requestLogger } from "./requestLogger";

@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
   AUTO_SUGGEST_USERS_DEFAULT_LIMIT,
+  HTTP_CODE_FORBIDDEN,
   HTTP_CODE_NOT_FOUND,
+  MESSAGE_FORBIDDEN,
   MESSAGE_NOT_FOUND,
 } from "../../constants";
 import { validators } from "../middlewares";
@@ -10,6 +12,19 @@ import { UserService } from "../../services/user";
 const USER_PREFIX = "/user";
 
 export const userRouter = (app: Router) => {
+  app.route(`${USER_PREFIX}/login`).post(async (req, res, next) => {
+    const { login, password } = req.body;
+
+    try {
+      const token = await UserService.login(login, password);
+      token
+        ? res.send(token)
+        : res.status(HTTP_CODE_FORBIDDEN).send(MESSAGE_FORBIDDEN);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app
     .route(`${USER_PREFIX}/`)
     .get(async (req, res, next) => {
